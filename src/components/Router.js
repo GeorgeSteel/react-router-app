@@ -11,14 +11,40 @@ import Contact from './Contact'
 
 export default class Router extends Component {
     state = {
-        products: []
+        products: [],
+        search: ''
     }
 
     componentWillMount() {
         this.setState({products: infProducts});
     }
 
+    searchProduct = query => {
+        if (query.length > 3) {
+            this.setState({
+                search: query
+            });
+        } else {
+            this.setState({
+                search: ''
+            });
+        }
+    }
+
     render() {
+
+        let products = [...this.state.products];
+        let search = this.state.search;
+        let result;
+
+        if (search !== '') {
+            result = products.filter(product => (
+                product.nombre.toLowerCase().indexOf(search.toLowerCase()) !== -1
+            ));
+        } else {
+            result = products;
+        }
+
         return (
             <BrowserRouter>
                 <div className="contenedor">
@@ -27,13 +53,15 @@ export default class Router extends Component {
                     <Switch>
                         <Route exact path="/" render={() => (
                             <Products
-                                products={this.state.products}
+                                products={result}
+                                searchProduct={ this.searchProduct }
                             />
                         )} />
                         <Route exact path="/about" component={About} />
                         <Route exact path="/products" render={() => (
                             <Products
-                                products={this.state.products}
+                                products={result}
+                                searchProduct={ this.searchProduct }
                             />
                         )} />
                         <Route exact path="/product/:id" render={(props) => {
